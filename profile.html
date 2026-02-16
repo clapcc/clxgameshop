@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - CLX3Z Shop</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pyidaungsu:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { --primary: #fbbf24; --bg: #0f172a; --card: #1e293b; --success: #4ade80; --border: #334155; }
+        
+        body { font-family: 'Pyidaungsu', sans-serif; background: var(--bg); color: white; margin: 0; padding: 0; display: none; }
+        
+        /* Profile Header */
+        .profile-header { background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%); padding: 40px 20px; text-align: center; border-bottom: 1px solid var(--border); position: relative; }
+        .avatar-circle { width: 85px; height: 85px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; font-size: 45px; color: #000; box-shadow: 0 0 25px rgba(251, 191, 36, 0.25); }
+        .username-text { font-size: 19px; font-weight: bold; margin: 5px 0; }
+        
+        .uid-box { font-size: 13px; color: var(--primary); background: rgba(251, 191, 36, 0.1); display: inline-flex; align-items: center; gap: 8px; padding: 8px 18px; border-radius: 12px; margin-bottom: 15px; border: 1px solid var(--primary); font-weight: bold; }
+        .user-status { font-size: 12px; color: var(--success); background: rgba(74, 222, 128, 0.1); padding: 5px 15px; border-radius: 25px; border: 1px solid rgba(74, 222, 128, 0.2); }
+
+        /* Stats Grid */
+        .info-container { padding: 25px 20px; max-width: 500px; margin: auto; }
+        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 30px; }
+        .stat-card { background: var(--card); padding: 20px; border-radius: 18px; border: 1px solid var(--border); text-align: center; }
+        .stat-card i { color: var(--primary); margin-bottom: 10px; font-size: 24px; }
+        .stat-card span { display: block; font-size: 12px; color: #94a3b8; }
+        .stat-card b { font-size: 17px; color: #fff; }
+
+        /* Menu */
+        .menu-list { background: var(--card); border-radius: 22px; border: 1px solid var(--border); overflow: hidden; }
+        .menu-item { display: flex; align-items: center; justify-content: space-between; padding: 18px 20px; color: white; text-decoration: none; border-bottom: 1px solid var(--border); transition: 0.3s; cursor: pointer; }
+        .menu-item:last-child { border-bottom: none; }
+        .menu-item i:first-child { width: 25px; color: var(--primary); }
+        .menu-item .label { flex: 1; margin-left: 12px; font-size: 14px; }
+
+        .logout-btn { display: block; text-align: center; color: #ef4444; margin-top: 35px; font-weight: bold; text-decoration: none; padding: 16px; border: 1px solid #ef4444; border-radius: 18px; cursor: pointer; }
+
+        /* --- အသေသပ်ဆုံး Password Modal --- */
+        .modal { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0, 0, 0, 0.85); 
+            display: none; /* JavaScript မှ flex ပြောင်းပါမည် */
+            align-items: center; justify-content: center; 
+            z-index: 9999; padding: 20px; box-sizing: border-box;
+            backdrop-filter: blur(8px);
+        }
+        .modal-content { 
+            background: #1e293b; width: 100%; max-width: 350px; 
+            padding: 30px; border-radius: 28px; 
+            border: 1px solid rgba(251, 191, 36, 0.3); 
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            position: relative;
+        }
+        .modal-content h3 { margin: 0 0 25px 0; color: var(--primary); text-align: center; font-size: 20px; }
+        
+        .input-group { margin-bottom: 20px; text-align: left; }
+        .input-group label { display: block; font-size: 13px; color: #94a3b8; margin-bottom: 8px; font-weight: 500; }
+        .input-group input { 
+            width: 100%; padding: 14px; border-radius: 12px; border: 1px solid #334155; 
+            background: #0f172a; color: white; outline: none; transition: 0.3s; 
+            box-sizing: border-box; /* ဘောင်ကျော်မထွက်စေရန် အရေးကြီးသည် */
+            font-size: 14px;
+        }
+        .input-group input:focus { border-color: var(--primary); }
+        
+        .modal-btns { display: flex; gap: 12px; margin-top: 10px; }
+        .modal-btns button { flex: 1; padding: 14px; border-radius: 12px; border: none; font-weight: 700; cursor: pointer; font-size: 14px; }
+        .btn-cancel { background: #334155; color: #94a3b8; }
+        .btn-save { background: var(--primary); color: #000; }
+    </style>
+</head>
+<body>
+
+<div class="profile-header">
+    <a href="index.html" style="position: absolute; left: 20px; top: 20px; color: white;"><i class="fa-solid fa-arrow-left fa-lg"></i></a>
+    <div class="avatar-circle"><i class="fa-solid fa-user"></i></div>
+    <div class="username-text" id="displayUser">Loading...</div>
+    
+    <div class="uid-box">
+        ID: <span id="displayCustomID">CLX--------</span>
+        <i class="fa-regular fa-copy" onclick="copyUID()" style="margin-left: 5px;"></i>
+    </div>
+    <br>
+    <span class="user-status" id="userRoleTag"><i class="fa-solid fa-check-circle"></i> Member</span>
+    <div id="adminArea"></div>
+</div>
+
+<div class="info-container">
+    <div class="stat-grid">
+        <div class="stat-card">
+            <i class="fa-solid fa-wallet"></i>
+            <span>Wallet Balance</span>
+            <b id="displayBal">0 K</b>
+        </div>
+        <div class="stat-card">
+            <i class="fa-solid fa-cart-shopping"></i>
+            <span>Total Orders</span>
+            <b id="orderCount">0</b>
+        </div>
+    </div>
+
+    <div class="menu-list">
+        <a href="topup-history.html" class="menu-item">
+            <i class="fa-solid fa-clock-rotate-left"></i>
+            <span class="label">Top-up History</span>
+            <i class="fa-solid fa-chevron-right" style="font-size: 12px; opacity: 0.3;"></i>
+        </a>
+        <a href="history.html" class="menu-item">
+            <i class="fa-solid fa-receipt"></i>
+            <span class="label">Purchase History</span>
+            <i class="fa-solid fa-chevron-right" style="font-size: 12px; opacity: 0.3;"></i>
+        </a>
+        <div class="menu-item" onclick="openPassModal()">
+            <i class="fa-solid fa-key"></i>
+            <span class="label">Change Password</span>
+            <i class="fa-solid fa-chevron-right" style="font-size: 12px; opacity: 0.3;"></i>
+        </div>
+        <a href="https://t.me/clx3zv" target="_blank" class="menu-item">
+            <i class="fa-solid fa-headset"></i>
+            <span class="label">Customer Support</span>
+            <i class="fa-solid fa-chevron-right" style="font-size: 12px; opacity: 0.3;"></i>
+        </a>
+    </div>
+    <div class="logout-btn" onclick="logout()">Logout Account</div>
+</div>
+
+<div class="modal" id="passModal">
+    <div class="modal-content">
+        <i class="fa-solid fa-shield-keyhole" style="display: block; text-align: center; font-size: 35px; color: var(--primary); margin-bottom: 15px;"></i>
+        <h3>Update Password</h3>
+        
+        <div class="input-group">
+            <label>New Password</label>
+            <input type="password" id="newPass" placeholder="အနည်းဆုံး 6 လုံး">
+        </div>
+        
+        <div class="input-group">
+            <label>Confirm Password</label>
+            <input type="password" id="confirmPass" placeholder="အနည်းဆုံး 6 လုံး">
+        </div>
+        
+        <div class="modal-btns">
+            <button class="btn-cancel" onclick="closePassModal()">Cancel</button>
+            <button class="btn-save" onclick="updatePassword()">Update Now</button>
+        </div>
+    </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyDMh3RBgpDH42PrzPl0bZs1rRx9Rh0azoY",
+        authDomain: "clx3z-shop.firebaseapp.com",
+        databaseURL: "https://clx3z-shop-default-rtdb.firebaseio.com",
+        projectId: "clx3z-shop",
+        storageBucket: "clx3z-shop.appspot.com",
+        messagingSenderId: "422558963520",
+        appId: "1:422558963520:web:1d4cea32b6f6692dae8ca5"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    const auth = firebase.auth();
+
+    auth.onAuthStateChanged(user => {
+        if (user) {
+            document.body.style.display = "block";
+            db.ref('users/' + user.uid).on('value', snap => {
+                const data = snap.val();
+                if(data) {
+                    document.getElementById('displayUser').innerText = data.name || data.email.split('@')[0];
+                    document.getElementById('displayBal').innerText = (data.balance || 0).toLocaleString() + " K";
+                    if (data.customID) document.getElementById('displayCustomID').innerText = data.customID;
+                    
+                    if (user.uid === "qSTxwnD9yhRrK2YORR6C2vT6GT13") {
+                        document.getElementById('userRoleTag').innerHTML = '<i class="fa-solid fa-crown"></i> Admin Account';
+                        document.getElementById('userRoleTag').style.color = "#fbbf24";
+                        document.getElementById('adminArea').innerHTML = `<a href="admin.html" style="display:inline-block; margin-top:10px; padding:10px 20px; background:#fbbf24; color:#000; text-align:center; border-radius:12px; text-decoration:none; font-weight:bold; font-size:12px;">Go to Admin Panel</a>`;
+                    }
+                }
+            });
+            db.ref('orders').orderByChild('userUID').equalTo(user.uid).on('value', snap => {
+                document.getElementById('orderCount').innerText = snap.numChildren();
+            });
+        } else { window.location.href = "login.html"; }
+    });
+
+    function openPassModal() { document.getElementById('passModal').style.display = 'flex'; }
+    function closePassModal() { document.getElementById('passModal').style.display = 'none'; }
+
+    function updatePassword() {
+        const user = auth.currentUser;
+        const newPass = document.getElementById('newPass').value;
+        const confirmPass = document.getElementById('confirmPass').value;
+        if (newPass.length < 6) { alert("အနည်းဆုံး ၆ လုံးရှိရပါမည်။"); return; }
+        if (newPass !== confirmPass) { alert("Password မတူညီပါဘူးဗျ။"); return; }
+
+        user.updatePassword(newPass).then(() => {
+            alert("အောင်မြင်စွာ ပြောင်းလဲပြီးပါပြီ။");
+            closePassModal();
+        }).catch((error) => {
+            if (error.code === 'auth/requires-recent-login') {
+                alert("လုံခြုံရေးအရ Logout ထွက်ပြီး ပြန်ဝင်ပေးပါ။");
+                auth.signOut().then(() => window.location.href = "login.html");
+            } else { alert("Error: " + error.message); }
+        });
+    }
+
+    function copyUID() {
+        const uid = document.getElementById('displayCustomID').innerText;
+        navigator.clipboard.writeText(uid).then(() => alert("Copied: " + uid));
+    }
+
+    function logout() {
+        if(confirm("ထွက်မှာ သေချာပါသလား?")) auth.signOut().then(() => window.location.href = "login.html");
+    }
+</script>
+</body>
+</html>

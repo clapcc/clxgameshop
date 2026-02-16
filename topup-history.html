@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Top-up History - CLX3Z</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pyidaungsu:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { --primary: #fbbf24; --bg: #0f172a; --card: #1e293b; --success: #4ade80; --danger: #ef4444; --warning: #f59e0b; }
+        body { font-family: 'Pyidaungsu', sans-serif; background: var(--bg); color: white; margin: 0; padding-bottom: 30px; }
+        
+        .header { display: flex; align-items: center; padding: 20px; background: var(--card); border-bottom: 1px solid #334155; position: sticky; top: 0; z-index: 100; }
+        .header h3 { margin: 0; flex: 1; text-align: center; margin-right: 30px; font-size: 18px; color: var(--primary); }
+
+        .container { padding: 15px; max-width: 600px; margin: auto; }
+        
+        .card { background: var(--card); border-radius: 18px; padding: 18px; border: 1px solid #334155; margin-bottom: 15px; position: relative; overflow: hidden; }
+        .card::before { content: ''; position: absolute; left: 0; top: 0; height: 100%; width: 4px; background: transparent; }
+        
+        /* Status Borders */
+        .card.status-Pending::before { background: var(--warning); }
+        .card.status-Success::before { background: var(--success); }
+        .card.status-Rejected::before { background: var(--danger); }
+
+        .row-main { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .amount { font-size: 18px; font-weight: bold; }
+        
+        .status-badge { font-size: 10px; padding: 3px 10px; border-radius: 6px; font-weight: bold; text-transform: uppercase; }
+        .badge-Pending { background: rgba(245, 158, 11, 0.1); color: var(--warning); border: 1px solid var(--warning); }
+        .badge-Success { background: rgba(74, 222, 128, 0.1); color: var(--success); border: 1px solid var(--success); }
+        .badge-Rejected { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid var(--danger); }
+
+        .details { font-size: 12px; color: #94a3b8; display: flex; flex-direction: column; gap: 4px; }
+        .details b { color: #cbd5e1; }
+
+        /* Rejection Message */
+        .reject-box { margin-top: 12px; padding: 10px; background: rgba(239, 68, 68, 0.1); border-radius: 10px; border-left: 3px solid var(--danger); }
+        .reject-box span { display: block; font-size: 11px; color: var(--danger); font-weight: bold; margin-bottom: 2px; }
+        .reject-box p { margin: 0; font-size: 12px; color: #fecaca; }
+
+        .empty-state { text-align: center; margin-top: 100px; opacity: 0.5; }
+        .empty-state i { font-size: 50px; margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <a href="profile.html" style="color: white; text-decoration: none;"><i class="fa-solid fa-arrow-left fa-lg"></i></a>
+    <h3>Top-up History</h3>
+</div>
+
+<div class="container" id="historyContainer">
+    <div style="text-align: center; padding: 50px;">
+        <i class="fas fa-spinner fa-spin"></i> Loading...
+    </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyDMh3RBgpDH42PrzPl0bZs1rRx9Rh0azoY",
+        authDomain: "clx3z-shop.firebaseapp.com",
+        databaseURL: "https://clx3z-shop-default-rtdb.firebaseio.com",
+        projectId: "clx3z-shop",
+        storageBucket: "clx3z-shop.appspot.com",
+        messagingSenderId: "422558963520",
+        appId: "1:422558963520:web:1d4cea32b6f6692dae8ca5"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    const auth = firebase.auth();
+
+    auth.onAuthStateChanged(user => {
+        if (user) {
+            loadTopupHistory(user.uid);
+        } else {
+            window.location.href = "login.html";
+        }
+    });
+
+    function loadTopupHistory(uid) {
+        db.ref('topupRequests').orderByChild('user').equalTo(uid).on('value', snap => {
+            const container = document.getElementById('historyContainer');
+            container.innerHTML = "";
+
+            if (!snap.exists()) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fa-solid fa-receipt"></i>
+                        <p>မှတ်တမ်းမရှိသေးပါ။</p>
+                    </div>`;
+                return;
+            }
+
+            let records = [];
+            snap.forEach(child => {
+                records.unshift(child.val()); // အသစ်တွေကို အပေါ်ဆုံးမှာပြမယ်
+            });
+
+            records.forEach(data => {
+                const status = data.status || "Pending";
+                let rejectArea = "";
+
+                if (status === "Rejected" && data.rejectReason) {
+                    rejectArea = `
+                        <div class="reject-box">
+                            <span>REJECTION REASON:</span>
+                            <p>${data.rejectReason}</p>
+                        </div>
+                    `;
+                }
+
+                container.innerHTML += `
+                    <div class="card status-${status}">
+                        <div class="row-main">
+                            <div class="amount">${(data.amount || 0).toLocaleString()} K</div>
+                            <span class="status-badge badge-${status}">${status}</span>
+                        </div>
+                        <div class="details">
+                            <div>ပြေစာ နံပတ် (နောက်ဆုံး 6 လုံး): <b>${data.lastDigits}</b></div>
+                            <div>ငွေပေးချေမှု နည်းလမ်း: <b>${data.method || 'Mobile Wallet'}</b></div>
+                            <div>ရက်စွဲ: <b>${data.date || 'N/A'}</b></div>
+                        </div>
+                        ${rejectArea}
+                    </div>
+                `;
+            });
+        });
+    }
+</script>
+</body>
+</html>

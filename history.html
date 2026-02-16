@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order History - CLX3Z Shop</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pyidaungsu:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { --primary: #fbbf24; --bg: #0f172a; --card: #1e293b; --success: #4ade80; --danger: #ef4444; }
+        body { font-family: 'Pyidaungsu', sans-serif; background: var(--bg); color: white; margin: 0; padding: 15px; display: none; }
+        .container { max-width: 500px; margin: auto; }
+        
+        .header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
+        .header a { color: white; text-decoration: none; font-size: 18px; }
+
+        .history-list { display: flex; flex-direction: column; gap: 12px; }
+        .history-item { background: var(--card); border-radius: 15px; padding: 18px; border: 1px solid #334155; position: relative; }
+        
+        .item-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+        .item-name { font-weight: bold; font-size: 15px; color: var(--primary); }
+
+        .item-details { font-size: 13px; color: #94a3b8; line-height: 1.8; }
+        .item-details b { color: #cbd5e1; font-weight: normal; margin-right: 5px; }
+        .item-price { font-size: 14px; font-weight: bold; color: var(--success); }
+
+        /* Status Badges - စာလုံးအကြီးအသေး အကုန် Support လုပ်အောင် ပြင်ထားသည် */
+        .status-badge { padding: 5px 12px; border-radius: 8px; font-size: 11px; font-weight: bold; text-transform: capitalize; }
+        
+        .status-pending, .status-Pending { background: rgba(251, 191, 36, 0.1); color: #fbbf24; border: 1px solid #fbbf24; }
+        .status-success, .status-Success { background: rgba(74, 222, 128, 0.1); color: #4ade80; border: 1px solid #4ade80; }
+        .status-cancel, .status-Cancel, .status-failed { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid #ef4444; }
+
+        .empty-state { text-align: center; margin-top: 100px; opacity: 0.5; }
+        .empty-state i { font-size: 50px; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <a href="index.html"><i class="fa-solid fa-chevron-left"></i></a>
+        <h2 style="margin:0; font-size:20px;">ဝယ်ယူမှုမှတ်တမ်း</h2>
+    </div>
+
+    <div id="historyList" class="history-list">
+        <div class="empty-state" id="loading">
+            <i class="fa-solid fa-spinner fa-spin"></i>
+            <p>Loading records...</p>
+        </div>
+    </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyDMh3RBgpDH42PrzPl0bZs1rRx9Rh0azoY",
+        authDomain: "clx3z-shop.firebaseapp.com",
+        databaseURL: "https://clx3z-shop-default-rtdb.firebaseio.com/",
+        projectId: "clx3z-shop",
+        storageBucket: "clx3z-shop.appspot.com",
+        messagingSenderId: "422558963520",
+        appId: "1:422558963520:web:1d4cea32b6f6692dae8ca5"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    const auth = firebase.auth();
+
+    auth.onAuthStateChanged(user => {
+        if (user) {
+            document.body.style.display = "block";
+            loadHistory(user.uid);
+        } else {
+            window.location.replace("login.html");
+        }
+    });
+
+    function loadHistory(uid) {
+        const listDiv = document.getElementById('historyList');
+        
+        // ဝယ်ယူထားတဲ့ orders တွေကို userUID နဲ့ စစ်ထုတ်ပြီး Real-time နားထောင်မယ်
+        db.ref('orders').orderByChild('userUID').equalTo(uid).on('value', snap => {
+            listDiv.innerHTML = "";
+            const data = snap.val();
+
+            if (!data) {
+                listDiv.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fa-solid fa-box-open"></i>
+                        <p>မှတ်တမ်းမရှိသေးပါ။</p>
+                    </div>`;
+                return;
+            }
+
+            const orders = [];
+            snap.forEach(childSnap => {
+                orders.push(childSnap.val());
+            });
+            orders.reverse(); // နောက်ဆုံးဝယ်တာ အပေါ်တင်မယ်
+
+            orders.forEach(order => {
+                const status = order.status || "Pending";
+                const html = `
+                    <div class="history-item">
+                        <div class="item-top">
+                            <span class="item-name">${order.itemName || 'Diamond Topup'}</span>
+                            <span class="status-badge status-${status.toLowerCase()}">${status}</span>
+                        </div>
+                        <div class="item-details">
+                            <b>Game ID:</b> ${order.gameId} ${order.serverId ? '(' + order.serverId + ')' : ''}<br>
+                            <b>Price:</b> <span class="item-price">${(order.price || 0).toLocaleString()} K</span><br>
+                            <b>Date:</b> <span style="font-size:11px;">${order.date || '-'}</span>
+                        </div>
+                    </div>
+                `;
+                listDiv.innerHTML += html;
+            });
+        });
+    }
+</script>
+</body>
+</html>

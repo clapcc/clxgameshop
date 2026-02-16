@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MLBB Shop - CLX3Z</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pyidaungsu:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { --primary: #fbbf24; --bg: #0f172a; --card: #1e293b; --success: #4ade80; }
+        body { font-family: 'Pyidaungsu', sans-serif; background: var(--bg); color: white; margin: 0; padding: 15px; display: none; }
+        .container { max-width: 550px; margin: auto; background: var(--card); padding: 20px; border-radius: 20px; border: 1px solid #334155; }
+        
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .balance-box { background: #111827; padding: 8px 15px; border-radius: 12px; border: 1px solid var(--primary); color: var(--success); font-weight: bold; }
+
+        .input-card { background: #0f172a; padding: 15px; border-radius: 15px; margin-bottom: 20px; border: 1px solid #334155; }
+        .input-group { display: flex; gap: 8px; margin-bottom: 10px; }
+        input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #334155; background: #1e293b; color: white; outline: none; box-sizing: border-box; }
+        .btn-check { width: 100%; padding: 12px; background: var(--primary); color: #000; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+
+        .section-title { margin: 25px 0 12px; font-size: 15px; color: var(--primary); border-left: 4px solid var(--primary); padding-left: 10px; font-weight: bold; }
+        
+        .diamond-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .item { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 12px 5px; text-align: center; cursor: pointer; transition: 0.2s; position: relative; overflow: hidden; }
+        .item b { display: block; color: #fff; font-size: 13px; margin-bottom: 4px; }
+        .item span { font-size: 10px; color: #94a3b8; display: block; }
+        .item.active { background: rgba(251, 191, 36, 0.2); border-color: var(--primary); transform: scale(1.03); }
+        .item.hot::after { content: "HOT"; position: absolute; top: 0; right: 0; background: #ef4444; color: white; font-size: 8px; padding: 2px 5px; border-bottom-left-radius: 8px; font-weight: bold; }
+
+        .footer-fixed { margin-top: 30px; border-top: 1px solid #334155; padding-top: 20px; }
+        .total-display { text-align: center; font-size: 18px; margin-bottom: 15px; color: var(--primary); font-weight: bold; }
+        .btn-buy { width: 100%; padding: 16px; background: var(--primary); color: #000; border: none; border-radius: 15px; font-size: 16px; font-weight: bold; cursor: pointer; }
+        .btn-buy:disabled { background: #4b5563; cursor: not-allowed; opacity: 0.6; }
+        
+        #playerResult { text-align: center; margin-top: 10px; font-size: 13px; font-weight: bold; }
+
+        /* ပြင်ဆင်လိုက်သော Receipt Modal Styles */
+        #receiptModal { 
+            display:none; 
+            position:fixed; 
+            top:0; left:0; 
+            width:100%; height:100%; 
+            background:rgba(0,0,0,0.85); 
+            z-index:9999; 
+            align-items:center; 
+            justify-content:center; 
+            padding:15px; 
+            box-sizing: border-box; /* ဘေးမကျော်အောင် ထိန်းပေးခြင်း */
+        }
+        .receipt-card { 
+            background:white; 
+            color:#333; 
+            width:100%; 
+            max-width:380px; 
+            border-radius:25px; 
+            padding:25px; 
+            font-family: 'Pyidaungsu', sans-serif; 
+            position:relative;
+            box-sizing: border-box; /* Padding ကြောင့် Card မပြဲသွားစေရန် */
+        }
+        .receipt-card h2 { text-align:center; color:#0f172a; font-size:18px; margin-bottom:20px; font-weight: bold; }
+        .rec-row { display:flex; justify-content:space-between; margin-bottom:12px; border-bottom:1px solid #f1f1f1; padding-bottom:8px; font-size:13px; }
+        .rec-row span { color:#666; }
+        .rec-row b { color:#0f172a; text-align: right; margin-left: 10px; }
+        .btn-rec-home { width:100%; padding:14px; background:#0f172a; color:white; border:none; border-radius:15px; font-weight:bold; margin-top:20px; cursor:pointer; }
+        .btn-rec-again { width:100%; padding:14px; background:white; color:#0f172a; border:2px solid #0f172a; border-radius:15px; font-weight:bold; margin-top:10px; cursor:pointer; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <a href="index.html" style="color: var(--primary); text-decoration: none; font-weight: bold;"><i class="fa-solid fa-arrow-left"></i> Back</a>
+        <div class="balance-box"><span id="displayBal">0</span> K</div>
+    </div>
+
+    <div class="input-card">
+        <div class="input-group">
+            <input type="number" id="userId" placeholder="Player ID">
+            <input type="number" id="zoneId" placeholder="Zone ID" style="width: 45%;">
+        </div>
+        <button class="btn-check" id="verifyBtn" onclick="checkPlayerID()">Confirm Player ID</button>
+        <div id="playerResult"></div>
+    </div>
+
+    <div class="section-title">Popular Items</div>
+    <div class="diamond-grid" style="grid-template-columns: 1fr 1fr;">
+        <div class="item hot" onclick="selectItem(this, 'Weekly Diamond Pass', 6000)"><b>Weekly Pass</b><span>6,000 K</span></div>
+        <div class="item" onclick="selectItem(this, 'Twilight Pass', 12500)"><b>Twilight Pass</b><span>12,500 K</span></div>
+    </div>
+
+    <div class="section-title">Small Bundles</div>
+    <div class="diamond-grid">
+        <div class="item" onclick="selectItem(this, '5 Diamonds', 200)"><b>5 💎</b><span>200 K</span></div>
+        <div class="item" onclick="selectItem(this, '11 Diamonds', 450)"><b>11 💎</b><span>450 K</span></div>
+        <div class="item" onclick="selectItem(this, '14 Diamonds', 550)"><b>14 💎</b><span>550 K</span></div>
+        <div class="item" onclick="selectItem(this, '19 Diamonds', 750)"><b>19 💎</b><span>750 K</span></div>
+        <div class="item" onclick="selectItem(this, '28 Diamonds', 1100)"><b>28 💎</b><span>1,100 K</span></div>
+        <div class="item" onclick="selectItem(this, '42 Diamonds', 1600)"><b>42 💎</b><span>1,600 K</span></div>
+    </div>
+
+    <div class="section-title">Standard Bundles</div>
+    <div class="diamond-grid">
+        <div class="item" onclick="selectItem(this, '86 Diamonds', 3200)"><b>86 💎</b><span>3,200 K</span></div>
+        <div class="item" onclick="selectItem(this, '172 Diamonds', 5400)"><b>172 💎</b><span>5,400 K</span></div>
+        <div class="item" onclick="selectItem(this, '257 Diamonds', 8100)"><b>257 💎</b><span>8,100 K</span></div>
+        <div class="item" onclick="selectItem(this, '344 Diamonds', 10800)"><b>344 💎</b><span>10,800 K</span></div>
+        <div class="item" onclick="selectItem(this, '429 Diamonds', 13500)"><b>429 💎</b><span>13,500 K</span></div>
+        <div class="item" onclick="selectItem(this, '706 Diamonds', 22000)"><b>706 💎</b><span>22,000 K</span></div>
+    </div>
+
+    <div class="footer-fixed">
+        <div class="total-display" id="totalPrice">Total: 0 MMK</div>
+        <button class="btn-buy" id="buyBtn" onclick="processOrder()" disabled>ဝယ်ယူမည်</button>
+    </div>
+</div>
+
+<div id="receiptModal">
+    <div class="receipt-card">
+        <h2>ဝယ်ယူမှုအချက်အလက်များ</h2>
+        <div class="rec-row"><span>ဝယ်ယူသောပစ္စည်း:</span><b id="recItem">-</b></div>
+        <div class="rec-row"><span>ဂိမ်းအမည်:</span><b id="recName">-</b></div>
+        <div class="rec-row"><span>အော်ဒါ ID:</span><b id="recOrderId">-</b></div>
+        <div class="rec-row"><span>ဂိမ်း ID (Zone):</span><b id="recFullId">-</b></div>
+        <div class="rec-row"><span>ရက်စွဲ:</span><b id="recDate">-</b></div>
+        <div class="rec-row" style="border:none; margin-top:10px;">
+            <span>စုစုပေါင်းကျသင့်ငွေ:</span>
+            <b style="font-size:18px; color:#0f172a;" id="recPrice">MMK 0</b>
+        </div>
+        <button class="btn-rec-home" onclick="window.location.href='index.html'">ပင်မသို့သွားရန်</button>
+        <button class="btn-rec-again" onclick="window.location.reload()">ထပ်မံဝယ်ယူရန်</button>
+    </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyDMh3RBgpDH42PrzPl0bZs1rRx9Rh0azoY",
+        authDomain: "clx3z-shop.firebaseapp.com",
+        databaseURL: "https://clx3z-shop-default-rtdb.firebaseio.com/",
+        projectId: "clx3z-shop",
+        storageBucket: "clx3z-shop.appspot.com",
+        messagingSenderId: "422558963520",
+        appId: "1:422558963520:web:1d4cea32b6f6692dae8ca5"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    const auth = firebase.auth();
+
+    let selectedItemName = "", selectedPrice = 0, isIdVerified = false, userUID = "", verifiedNickname = "";
+
+    auth.onAuthStateChanged(user => {
+        if (user) {
+            document.body.style.display = "block";
+            userUID = user.uid;
+            db.ref('users/' + user.uid + '/balance').on('value', snap => {
+                document.getElementById('displayBal').innerText = (snap.val() || 0).toLocaleString();
+            });
+        } else { window.location.replace("login.html"); }
+    });
+
+    async function checkPlayerID() {
+        const pID = document.getElementById('userId').value;
+        const zID = document.getElementById('zoneId').value;
+        const btn = document.getElementById('verifyBtn');
+        const resultText = document.getElementById('playerResult');
+
+        if (!pID || !zID) return alert("ID နှင့် Zone ကို ဖြည့်ပါဦးဗျ။");
+
+        btn.innerText = "Checking... ⏳";
+        btn.disabled = true;
+        resultText.innerText = "";
+        isIdVerified = false;
+        checkBtn();
+
+        setTimeout(() => {
+            verifiedNickname = "User_" + pID.substring(0, 4);
+            isIdVerified = true;
+            resultText.innerText = "Name: " + verifiedNickname + " ✅";
+            resultText.style.color = "#4ade80";
+            btn.innerText = "Confirm Player ID";
+            btn.disabled = false;
+            checkBtn();
+        }, 1200);
+    }
+
+    function selectItem(el, name, price) {
+        document.querySelectorAll('.item').forEach(i => i.classList.remove('active'));
+        el.classList.add('active');
+        selectedItemName = name;
+        selectedPrice = price;
+        document.getElementById('totalPrice').innerText = `Total: ${price.toLocaleString()} MMK`;
+        checkBtn();
+    }
+
+    function checkBtn() {
+        document.getElementById('buyBtn').disabled = !(isIdVerified && selectedItemName !== "");
+    }
+
+    function processOrder() {
+        if(!userUID || !isIdVerified) return;
+        const buyBtn = document.getElementById('buyBtn');
+        buyBtn.disabled = true;
+
+        db.ref('users/' + userUID).once('value', snap => {
+            const userData = snap.val();
+            const currentBal = (userData && userData.balance) ? userData.balance : 0;
+            
+            if(currentBal < selectedPrice) {
+                alert("လက်ကျန်ငွေ မလုံလောက်ပါ။");
+                buyBtn.disabled = false;
+                return;
+            }
+
+            if(confirm(`${selectedItemName} ကို ဝယ်ယူမှာ သေချာပါသလား?`)) {
+                db.ref('users/' + userUID).update({ balance: currentBal - selectedPrice }).then(() => {
+                    const orderId = "CLX" + Math.floor(100000 + Math.random() * 900000);
+                    const now = new Date().toLocaleString();
+                    const pID = document.getElementById('userId').value;
+                    const zID = document.getElementById('zoneId').value;
+                    const fullGameId = pID + " (" + zID + ")";
+
+                    db.ref('orders').push({
+                        orderId: orderId,
+                        userUID: userUID,
+                        email: userData.email || "No Email",
+                        gameId: fullGameId,
+                        playerName: verifiedNickname,
+                        itemName: selectedItemName,
+                        price: selectedPrice,
+                        status: "Pending",
+                        date: now
+                    }).then(() => {
+                        document.getElementById('recItem').innerText = selectedItemName;
+                        document.getElementById('recName').innerText = verifiedNickname;
+                        document.getElementById('recOrderId').innerText = orderId;
+                        document.getElementById('recFullId').innerText = fullGameId;
+                        document.getElementById('recDate').innerText = now;
+                        document.getElementById('recPrice').innerText = "MMK " + selectedPrice.toLocaleString();
+                        document.getElementById('receiptModal').style.display = "flex";
+                    });
+                });
+            } else {
+                buyBtn.disabled = false;
+            }
+        });
+    }
+</script>
+</body>
+</html>

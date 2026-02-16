@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CLX Shop - Home</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css" />
+    
+    <style>
+        :root {
+            --primary: #fbbf24;
+            --bg: #0f172a;
+            --card: #1e293b;
+            --text: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border: #334155;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding-bottom: 100px;
+            overflow-x: hidden;
+            display: none;
+        }
+
+        /* Header */
+        .header {
+            background: var(--card);
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .more-btn { font-size: 20px; color: var(--primary); cursor: pointer; }
+        .logo { color: var(--primary); font-weight: 800; font-size: 20px; letter-spacing: 1px; }
+
+        /* Sidebar Style */
+        .sidebar {
+            position: fixed; top: 0; left: -280px; width: 280px; height: 100%;
+            background: var(--card); z-index: 2000; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 10px 0 30px rgba(0,0,0,0.5); padding: 30px 20px;
+        }
+
+        .sidebar.active { left: 0; }
+
+        .sidebar-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); z-index: 1500; display: none;
+        }
+
+        .sidebar-header { margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 15px; }
+        
+        /* Sidebar User Count & Balance Box */
+        .stat-box {
+            margin: 15px 0;
+            background: rgba(251,191,36,0.05);
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(251,191,36,0.15);
+        }
+
+        .sidebar-menu { list-style: none; }
+        .sidebar-menu li { margin-bottom: 8px; }
+        .sidebar-menu a {
+            color: var(--text);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 15px;
+            padding: 12px;
+            border-radius: 10px;
+            transition: 0.3s;
+        }
+        .sidebar-menu a:hover { background: rgba(251,191,36,0.1); color: var(--primary); }
+
+        /* Banner & Content */
+        .swiper { width: 100%; padding: 20px 0; }
+        .swiper-slide { width: 85%; height: 160px; border-radius: 15px; overflow: hidden; }
+        .swiper-slide img { width: 100%; height: 100%; object-fit: cover; }
+        .section-title { padding: 0 20px; font-size: 17px; font-weight: 700; color: var(--primary); margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .section-title::before { content: ""; width: 4px; height: 18px; background: var(--primary); border-radius: 2px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 0 20px; }
+        .card { background: var(--card); border-radius: 20px; padding: 12px; text-align: center; text-decoration: none; color: var(--text); border: 1px solid var(--border); }
+        .card .game-img { width: 100%; height: 110px; border-radius: 15px; object-fit: cover; margin-bottom: 10px; }
+
+        /* Corrected Nav Bar */
+        .nav-bar {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: var(--card); display: flex; justify-content: space-around;
+            align-items: center; padding: 10px 0 25px 0; border-top: 1px solid var(--border); z-index: 1000;
+        }
+        .nav-item { color: var(--text-muted); text-decoration: none; font-size: 11px; text-align: center; flex: 1; }
+        .nav-item i { font-size: 20px; margin-bottom: 4px; display: block; }
+        .nav-item.active { color: var(--primary); font-weight: bold; }
+
+        .nav-item.wallet-center { position: relative; top: -18px; }
+        .wallet-icon-box {
+            background: linear-gradient(135deg, var(--primary), #d97706);
+            width: 55px; height: 55px; border-radius: 50%; display: flex;
+            align-items: center; justify-content: center; border: 5px solid var(--bg);
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar-overlay" id="overlay" onclick="toggleSidebar()"></div>
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2 style="color: var(--primary);">MENU</h2>
+            <p style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Premium Gaming Store</p>
+            
+            <div class="stat-box">
+                <span style="font-size: 10px; color: var(--text-muted); display: block; text-transform: uppercase;">Active Customers</span>
+                <span id="totalUsers" style="color: var(--primary); font-weight: 800; font-size: 18px;">1,000</span>
+                <span style="font-size: 10px; color: #4ade80; margin-left: 5px;"><i class="fa-solid fa-arrow-trend-up"></i></span>
+            </div>
+
+            <div class="stat-box" style="border-color: rgba(74, 222, 128, 0.2);">
+                <span style="font-size: 10px; color: var(--text-muted); display: block; text-transform: uppercase;">My Balance</span>
+                <span id="userBal" style="color: #4ade80; font-weight: 800; font-size: 18px;">0</span> <small style="color: #4ade80;">K</small>
+            </div>
+        </div>
+        
+        <ul class="sidebar-menu">
+            <li><a href="profile.html"><i class="fa-solid fa-circle-user"></i> My Profile</a></li>
+            <li><a href="wallet.html"><i class="fa-solid fa-wallet"></i> Topup Wallet</a></li>
+            <li><a href="history.html"><i class="fa-solid fa-clock-rotate-left"></i> Order History</a></li>
+            <li><a href="promotion.html"><i class="fa-solid fa-gift"></i> Rewards</a></li>
+            <hr style="border: 0; border-top: 1px solid var(--border); margin: 10px 0;">
+            <li><a href="#" onclick="logout()" style="color: #ef4444;"><i class="fa-solid fa-power-off"></i> Logout</a></li>
+        </ul>
+    </div>
+
+    <div class="header">
+        <i class="fa-solid fa-bars-staggered more-btn" onclick="toggleSidebar()"></i>
+        <div class="logo">CLX GAME SHOP</div>
+    </div>
+
+    <div class="swiper mySwiper">
+        <div class="swiper-wrapper">
+            <div class="swiper-slide"><img src="images/CLX.png"></div>
+            <div class="swiper-slide"><img src="images/S.png"></div>
+        </div>
+    </div>
+
+    <div class="section-title">Popular Games</div>
+    <div class="grid">
+        <a href="mlbb.html" class="card">
+            <img src="images/m.png" class="game-img">
+            <span>Mobile Legends</span>
+        </a>
+        <a href="pubg.html" class="card">
+            <img src="images/p.png" class="game-img">
+            <span>PUBG Mobile</span>
+        </a>
+    </div>
+
+    <div class="nav-bar">
+        <a href="index.html" class="nav-item active"><i class="fa-solid fa-house"></i>Home</a>
+        <a href="promotion.html" class="nav-item"><i class="fa-solid fa-bullhorn"></i>Promo</a>
+        <a href="wallet.html" class="nav-item wallet-center">
+            <div class="wallet-icon-box"><i class="fa-solid fa-wallet" style="color:#000; font-size: 20px;"></i></div>
+            Wallet
+        </a>
+        <a href="history.html" class="nav-item"><i class="fa-solid fa-receipt"></i>History</a>
+        <a href="profile.html" class="nav-item"><i class="fa-solid fa-user-gear"></i>Profile</a>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            sidebar.classList.toggle('active');
+            overlay.style.display = sidebar.classList.contains('active') ? 'block' : 'none';
+        }
+
+        new Swiper(".mySwiper", {
+            centeredSlides: true, slidesPerView: "auto", spaceBetween: 15,
+            loop: true, autoplay: { delay: 3000, disableOnInteraction: false }, speed: 1000
+        });
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDMh3RBgpDH42PrzPl0bZs1rRx9Rh0azoY",
+            authDomain: "clx3z-shop.firebaseapp.com",
+            databaseURL: "https://clx3z-shop-default-rtdb.firebaseio.com/",
+            projectId: "clx3z-shop",
+            storageBucket: "clx3z-shop.appspot.com",
+            messagingSenderId: "422558963520",
+            appId: "1:422558963520:web:1d4cea32b6f6692dae8ca5"
+        };
+        firebase.initializeApp(firebaseConfig);
+
+        function trackUserCount() {
+            const baseCount = 1000;
+            firebase.database().ref('users').on('value', snap => {
+                const total = baseCount + (snap.numChildren() || 0);
+                document.getElementById('totalUsers').innerText = total.toLocaleString();
+            });
+        }
+
+        firebase.auth().onAuthStateChanged(user => {
+            if (user) {
+                document.body.style.display = "block";
+                trackUserCount();
+                firebase.database().ref('users/' + user.uid + '/balance').on('value', snap => {
+                    document.getElementById('userBal').innerText = (snap.val() || 0).toLocaleString();
+                });
+            } else {
+                window.location.replace("login.html");
+            }
+        });
+
+        function logout() { firebase.auth().signOut().then(() => window.location.replace("login.html")); }
+    </script>
+</body>
+</html>

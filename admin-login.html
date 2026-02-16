@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - CLX3Z</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { font-family: sans-serif; background: #0f172a; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .login-card { background: #1e293b; padding: 30px; border-radius: 20px; width: 350px; border: 1px solid #fbbf24; text-align: center; }
+        input { width: 100%; padding: 12px; margin: 10px 0; background: #0f172a; border: 1px solid #334155; border-radius: 10px; color: white; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background: #fbbf24; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <h2 style="color:#fbbf24;"><i class="fa-solid fa-shield-halved"></i> Admin Access</h2>
+        <input type="email" id="email" placeholder="Admin Email">
+        <input type="password" id="password" placeholder="Password">
+        <button onclick="adminLogin()">Login as Admin</button>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDMh3RBgpDH42PrzPl0bZs1rRx9Rh0azoY",
+            authDomain: "clx3z-shop.firebaseapp.com",
+            projectId: "clx3z-shop",
+            appId: "1:422558963520:web:1d4cea32b6f6692dae8ca5"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+
+        const ADMIN_UID = "qSTxwnD9yhRrK2YORR6C2vT6GT13"; // သင့် UID
+
+        function adminLogin() {
+            const email = document.getElementById('email').value;
+            const pw = document.getElementById('password').value;
+
+            auth.signInWithEmailAndPassword(email, pw).then(res => {
+                if(res.user.uid === ADMIN_UID) {
+                    window.location.href = "admin.html";
+                } else {
+                    auth.signOut();
+                    alert("ဝင်ခွင့်မရှိပါ။ ဤသည်မှာ Admin များအတွက်သာ ဖြစ်သည်။");
+                }
+            }).catch(err => alert(err.message));
+        }
+    </script>
+</body>
+</html>

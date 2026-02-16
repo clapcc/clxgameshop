@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wallet - CLX Shop</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pyidaungsu:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { --primary: #fbbf24; --bg: #0f172a; --card: #1e293b; --success: #4ade80; }
+        body { font-family: 'Pyidaungsu', sans-serif; background: var(--bg); color: white; margin: 0; padding-bottom: 50px; display: none; }
+        
+        .header { background: var(--card); padding: 15px 20px; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid #334155; position: sticky; top: 0; z-index: 100; }
+        .header a { color: white; text-decoration: none; font-size: 20px; }
+        
+        .wallet-card { background: linear-gradient(135deg, #1e293b 0%, #334155 100%); margin: 20px; padding: 25px; border-radius: 20px; border: 1px solid var(--primary); text-align: center; }
+        .section-title { font-size: 14px; color: var(--primary); margin: 25px 20px 10px; font-weight: bold; border-left: 4px solid var(--primary); padding-left: 10px; text-transform: uppercase; }
+
+        .method-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 0 20px 20px; }
+        .method-item { background: var(--card); border: 2px solid #334155; border-radius: 15px; padding: 15px; text-align: center; cursor: pointer; transition: 0.3s; }
+        .method-item img { width: 40px; height: 40px; border-radius: 8px; margin-bottom: 8px; object-fit: contain; }
+        .method-item span { display: block; font-size: 12px; font-weight: bold; color: #94a3b8; }
+        .method-item.active { border-color: var(--primary); background: rgba(251, 191, 36, 0.05); }
+        .method-item.active span { color: var(--primary); }
+
+        .payment-method { background: var(--card); border-radius: 15px; padding: 12px; margin: 0 20px 10px; border: 1px solid #334155; display: flex; align-items: center; gap: 12px; }
+        .payment-method img { width: 40px; height: 40px; border-radius: 8px; object-fit: contain; }
+        .payment-info { flex: 1; }
+        .payment-info b { display: block; font-size: 14px; color: #fff; }
+        .payment-info span { font-size: 12px; color: #94a3b8; }
+        .copy-btn { background: rgba(251, 191, 36, 0.1); color: var(--primary); border: 1px solid var(--primary); padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: bold; cursor: pointer; }
+
+        .topup-form { background: var(--card); margin: 20px; padding: 20px; border-radius: 20px; border: 1px solid #334155; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-size: 12px; color: #94a3b8; margin-bottom: 6px; margin-left: 5px; }
+        .form-group input { width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155; border-radius: 12px; color: white; box-sizing: border-box; outline: none; font-family: 'Pyidaungsu'; }
+        
+        .upload-container { position: relative; width: 100%; min-height: 140px; border: 2px dashed #334155; border-radius: 15px; background: rgba(15, 23, 42, 0.5); display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; overflow: hidden; }
+        .upload-container i { font-size: 30px; color: var(--primary); margin-bottom: 8px; }
+        .upload-container span { font-size: 12px; color: #94a3b8; }
+        #previewImg { width: 100%; height: 100%; position: absolute; top: 0; left: 0; object-fit: contain; display: none; background: #1e293b; }
+        .change-badge { display: none; position: absolute; bottom: 10px; background: rgba(0,0,0,0.8); padding: 5px 12px; border-radius: 20px; font-size: 11px; color: #fff; z-index: 2; border: 1px solid #444; }
+
+        .submit-btn { width: 100%; background: #0088cc; color: #fff; border: none; padding: 15px; border-radius: 15px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 20px; font-size: 15px; }
+        .submit-btn:disabled { background: #334155; opacity: 0.7; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <a href="profile.html"><i class="fa-solid fa-arrow-left"></i></a>
+        <div style="font-size: 18px; font-weight: bold;">Wallet Top-up</div>
+    </div>
+
+    <div class="wallet-card">
+        <span style="font-size: 12px; color: #94a3b8; letter-spacing: 1px;">လက်ကျန်ငွေ</span>
+        <h2 id="userBal" style="margin: 10px 0 0 0; font-size: 28px;">0 <small style="font-size: 16px;">K</small></h2>
+    </div>
+
+    <div class="section-title">ငွေလွှဲရမည့် အကောင့်များ</div>
+    <div class="payment-method">
+        <img src="images/kpay.png" onerror="this.src='https://upload.wikimedia.org/wikipedia/en/d/d1/Kpay_logo.png'">
+        <div class="payment-info"><b>KBZPay (KYAW SWAR SOE)</b><span>09254668052</span></div>
+        <button class="copy-btn" onclick="copyText('09254668052')">COPY</button>
+    </div>
+    <div class="payment-method">
+        <img src="images/wave.png" onerror="this.src='https://wavemoney.com.mm/images/logo.png'">
+        <div class="payment-info"><b>Wave (AYE AYE KYU)</b><span>09402146484</span></div>
+        <button class="copy-btn" onclick="copyText('09402146484')">COPY</button>
+    </div>
+
+    <div class="section-title">ငွေလွှဲသည့် App ကိုရွေးပါ</div>
+    <div class="method-grid">
+        <div class="method-item" onclick="selectMethod('KBZPay', this)">
+            <img src="images/kpay.png" onerror="this.src='https://upload.wikimedia.org/wikipedia/en/d/d1/Kpay_logo.png'">
+            <span>KBZPay</span>
+        </div>
+        <div class="method-item" onclick="selectMethod('WaveMoney', this)">
+            <img src="images/wave.png" onerror="this.src='https://wavemoney.com.mm/images/logo.png'">
+            <span>WaveMoney</span>
+        </div>
+    </div>
+
+    <div class="topup-form">
+        <div class="form-group">
+            <label>ငွေပမာဏ (Amount)</label>
+            <input type="number" id="topupAmount" placeholder="ဥပမာ - 5000">
+        </div>
+
+        <div class="form-group">
+            <label>ပြေစာ နောက်ဆုံး ၆ လုံး (Last 6 Digits)</label>
+            <input type="number" id="lastDigits" placeholder="Transaction ID ခြောက်လုံး">
+        </div>
+
+        <div class="form-group">
+            <label>ပြေစာပုံ (Screenshot)</label>
+            <div class="upload-container" onclick="document.getElementById('fileInput').click()">
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+                <span id="uploadLabel">နှိပ်၍ ပုံရွေးချယ်ပါ</span>
+                <img id="previewImg">
+                <div id="changeBadge" class="change-badge"><i class="fa-solid fa-camera"></i> ပုံပြန်ရွေးရန်</div>
+            </div>
+            <input type="file" id="fileInput" accept="image/*" style="display: none;" onchange="previewFile()">
+        </div>
+
+        <button class="submit-btn" id="submitBtn" onclick="submitTopup()">
+            <i class="fa-brands fa-telegram"></i> အတည်ပြုတင်ပို့မည်
+        </button>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+
+    <script>
+        const BOT_TOKEN = "8395614309:AAHgpT1xvtKETNxHVE_-KvhnDXfL8zguF2c";
+        const ADMIN_CHAT_ID = "7694042410"; 
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDMh3RBgpDH42PrzPl0bZs1rRx9Rh0azoY",
+            authDomain: "clx3z-shop.firebaseapp.com",
+            databaseURL: "https://clx3z-shop-default-rtdb.firebaseio.com",
+            projectId: "clx3z-shop",
+            storageBucket: "clx3z-shop.appspot.com",
+            messagingSenderId: "422558963520",
+            appId: "1:422558963520:web:1d4cea32b6f6692dae8ca5"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        const auth = firebase.auth();
+        
+        let selectedMethod = "";
+        let userCustomID = "";
+
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                document.body.style.display = "block";
+                db.ref('users/' + user.uid).on('value', snap => {
+                    const data = snap.val();
+                    if(data) {
+                        document.getElementById('userBal').innerHTML = `${(data.balance || 0).toLocaleString()} <small style="font-size: 14px;">K</small>`;
+                        userCustomID = data.customID || "N/A";
+                    }
+                });
+            } else { window.location.replace("login.html"); }
+        });
+
+        function selectMethod(method, el) {
+            selectedMethod = method;
+            document.querySelectorAll('.method-item').forEach(item => item.classList.remove('active'));
+            el.classList.add('active');
+        }
+
+        function previewFile() {
+            const file = document.getElementById('fileInput').files[0];
+            const preview = document.getElementById('previewImg');
+            const label = document.getElementById('uploadLabel');
+            const badge = document.getElementById('changeBadge');
+            
+            if (file) {
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    preview.src = reader.result;
+                    preview.style.display = "block";
+                    badge.style.display = "block";
+                    label.style.display = "none";
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        async function submitTopup() {
+            const amt = document.getElementById('topupAmount').value;
+            const digits = document.getElementById('lastDigits').value;
+            const file = document.getElementById('fileInput').files[0];
+            const btn = document.getElementById('submitBtn');
+
+            if(!selectedMethod) return alert("ငွေလွှဲသည့် App ကို အရင်နှိပ်ရွေးပါ");
+            if(!amt || !digits || !file) return alert("အချက်အလက်အားလုံး ဖြည့်စွက်ပါ");
+            if(digits.length !== 6) return alert("ပြေစာနံပါတ် ၆ လုံး မှန်ကန်စွာ ဖြည့်ပါ");
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
+
+            const topupData = {
+                user: auth.currentUser.uid,
+                customID: userCustomID,
+                method: selectedMethod,
+                amount: parseInt(amt),
+                lastDigits: digits,
+                status: "Pending",
+                date: new Date().toLocaleString()
+            };
+
+            try {
+                await db.ref('topupRequests').push(topupData);
+                const message = `💸 ငွေဖြည့်တောင်းဆိုမှုသစ် 💸\n\n🆔 ID: ${userCustomID}\n🏦 Payment: ${selectedMethod}\n💰 ပမာဏ: ${amt} K\n🔢 ပြေစာ‌နောက် ၆ လုံး: ${digits}\n📅 နေ့စွဲ: ${topupData.date}`;
+                
+                const formData = new FormData();
+                formData.append('chat_id', ADMIN_CHAT_ID);
+                formData.append('photo', file);
+                formData.append('caption', message);
+
+                await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, { method: 'POST', body: formData });
+
+                alert("ငွေဖြည့်သွင်းမှု တင်ပြပြီးပါပြီ။ ခဏစောင့်ပေးပါ။");
+                window.location.href = "profile.html";
+            } catch (err) {
+                alert("တစ်ခုခု မှားယွင်းသွားပါသည်။");
+                btn.disabled = false;
+                btn.innerHTML = 'အတည်ပြုတင်ပို့မည်';
+            }
+        }
+
+        function copyText(text) {
+            navigator.clipboard.writeText(text);
+            alert("Copy ကူးပြီးပါပြီ: " + text);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PUBG Mobile UC Shop - CLX3Z</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pyidaungsu:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { --primary: #fbbf24; --bg: #0f172a; --card: #1e293b; --success: #4ade80; }
+        body { font-family: 'Pyidaungsu', sans-serif; background: #0f172a; color: white; margin: 0; padding: 15px; display: none; }
+        .container { max-width: 550px; margin: auto; background: #1e293b; padding: 20px; border-radius: 20px; border: 1px solid #334155; }
+        
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .balance-box { background: #111827; padding: 8px 15px; border-radius: 12px; border: 1px solid var(--primary); color: var(--success); font-weight: bold; }
+
+        .input-card { background: #0f172a; padding: 15px; border-radius: 15px; margin-bottom: 20px; border: 1px solid #334155; }
+        input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #334155; background: #1e293b; color: white; outline: none; box-sizing: border-box; }
+        .btn-check { width: 100%; padding: 12px; background: var(--primary); color: #000; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 10px; }
+
+        .section-title { margin: 25px 0 12px; font-size: 15px; color: var(--primary); border-left: 4px solid var(--primary); padding-left: 10px; font-weight: bold; }
+        
+        /* Grid System */
+        .item-grid { display: grid; gap: 10px; }
+        .grid-3 { grid-template-columns: repeat(3, 1fr); }
+        .grid-2 { grid-template-columns: repeat(2, 1fr); }
+        
+        .item { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 12px 5px; text-align: center; cursor: pointer; transition: 0.2s; position: relative; overflow: hidden; }
+        .item b { display: block; color: #fff; font-size: 13px; margin-bottom: 4px; }
+        .item span { font-size: 10px; color: #94a3b8; display: block; }
+        .item.active { background: rgba(251, 191, 36, 0.2); border-color: var(--primary); transform: scale(1.03); }
+        .item.hot::after { content: "HOT"; position: absolute; top: 0; right: 0; background: #ef4444; color: white; font-size: 8px; padding: 2px 5px; border-bottom-left-radius: 8px; font-weight: bold; }
+
+        .footer-fixed { margin-top: 30px; border-top: 1px solid #334155; padding-top: 20px; }
+        .total-display { text-align: center; font-size: 18px; margin-bottom: 15px; color: var(--primary); font-weight: bold; }
+        .btn-buy { width: 100%; padding: 16px; background: var(--primary); color: #000; border: none; border-radius: 15px; font-size: 16px; font-weight: bold; cursor: pointer; }
+        .btn-buy:disabled { background: #4b5563; cursor: not-allowed; opacity: 0.6; }
+        
+        #playerResult { text-align: center; margin-top: 10px; font-size: 13px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <a href="index.html" style="color: var(--primary); text-decoration: none; font-weight: bold;"><i class="fa-solid fa-arrow-left"></i> Back</a>
+        <div class="balance-box"><span id="displayBal">0</span> K</div>
+    </div>
+
+    <div class="input-card">
+        <input type="number" id="userId" placeholder="Enter Character ID (e.g. 512345678)">
+        <button class="btn-check" onclick="manualVerify()">Confirm Player ID</button>
+        <div id="playerResult"></div>
+    </div>
+
+    <div class="section-title">Popular Items</div>
+    <div class="item-grid grid-3">
+        <div class="item hot" onclick="selectItem(this, '60 UC', 2500)"><b>60 UC</b><span>2,500 K</span></div>
+        <div class="item hot" onclick="selectItem(this, '325 UC', 12500)"><b>325 UC</b><span>12,500 K</span></div>
+        <div class="item" onclick="selectItem(this, 'Royale Pass Pack', 15000)"><b>RP Pack</b><span>15,000 K</span></div>
+    </div>
+
+    <div class="section-title">Small Bundles</div>
+    <div class="item-grid grid-2">
+        <div class="item" onclick="selectItem(this, '30 UC', 1300)"><b>30 UC</b><span>1,300 K</span></div>
+        <div class="item" onclick="selectItem(this, '15 UC', 700)"><b>15 UC</b><span>700 K</span></div>
+    </div>
+
+    <div class="section-title">Standard Bundles</div>
+    <div class="item-grid grid-3">
+        <div class="item" onclick="selectItem(this, '660 UC', 24500)"><b>660 UC</b><span>24,500 K</span></div>
+        <div class="item" onclick="selectItem(this, '985 UC', 36000)"><b>985 UC</b><span>36,000 K</span></div>
+        <div class="item" onclick="selectItem(this, '1800 UC', 62000)"><b>1800 UC</b><span>62,000 K</span></div>
+        <div class="item" onclick="selectItem(this, '3850 UC', 125000)"><b>3850 UC</b><span>125,000 K</span></div>
+        <div class="item" onclick="selectItem(this, '8100 UC', 245000)"><b>8100 UC</b><span>245,000 K</span></div>
+        <div class="item" onclick="selectItem(this, '16200 UC', 480000)"><b>16200 UC</b><span>480,000 K</span></div>
+    </div>
+
+    <div class="footer-fixed">
+        <div class="total-display" id="totalPrice">Total: 0 MMK</div>
+        <button class="btn-buy" id="buyBtn" onclick="processOrder()" disabled>ဝယ်ယူမည်</button>
+    </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyDMh3RBgpDH42PrzPl0bZs1rRx9Rh0azoY",
+        authDomain: "clx3z-shop.firebaseapp.com",
+        databaseURL: "https://clx3z-shop-default-rtdb.firebaseio.com/",
+        projectId: "clx3z-shop",
+        storageBucket: "clx3z-shop.appspot.com",
+        messagingSenderId: "422558963520",
+        appId: "1:422558963520:web:1d4cea32b6f6692dae8ca5"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    const auth = firebase.auth();
+
+    let selectedItemName = "";
+    let selectedPrice = 0;
+    let isIdVerified = false;
+    let userUID = "";
+
+    // Auth & Balance Fetch
+    auth.onAuthStateChanged(user => {
+        if (user) {
+            document.body.style.display = "block";
+            userUID = user.uid;
+            db.ref('users/' + user.uid + '/balance').on('value', snap => {
+                document.getElementById('displayBal').innerText = (snap.val() || 0).toLocaleString();
+            });
+        } else {
+            window.location.replace("login.html");
+        }
+    });
+
+    function manualVerify() {
+        const uid = document.getElementById('userId').value;
+        if(uid.length < 5) return alert("Character ID ကို မှန်ကန်စွာ ဖြည့်ပါ။");
+        isIdVerified = true;
+        document.getElementById('playerResult').innerText = "Player ID Confirmed ✅";
+        document.getElementById('playerResult').style.color = "#4ade80";
+        checkBtn();
+    }
+
+    function selectItem(el, name, price) {
+        document.querySelectorAll('.item').forEach(i => i.classList.remove('active'));
+        el.classList.add('active');
+        selectedItemName = name;
+        selectedPrice = price;
+        document.getElementById('totalPrice').innerText = `Total: ${price.toLocaleString()} MMK`;
+        checkBtn();
+    }
+
+    function checkBtn() {
+        if(isIdVerified && selectedItemName !== "") document.getElementById('buyBtn').disabled = false;
+    }
+
+    function processOrder() {
+        if(!userUID) return;
+        const buyBtn = document.getElementById('buyBtn');
+        buyBtn.disabled = true;
+
+        db.ref('users/' + userUID).once('value', snap => {
+            const userData = snap.val();
+            const currentBal = userData.balance || 0;
+
+            if(currentBal < selectedPrice) {
+                alert("ငွေမလုံလောက်ပါ");
+                buyBtn.disabled = false;
+                return;
+            }
+
+            if(confirm(`PUBG UC: ${selectedItemName} ကို ဝယ်ယူမှာလား?`)) {
+                db.ref('users/' + userUID).update({ balance: currentBal - selectedPrice }).then(() => {
+                    db.ref('orders').push({
+                        userUID: userUID,
+                        email: userData.email,
+                        gameId: document.getElementById('userId').value,
+                        gameName: "PUBG Mobile",
+                        itemName: selectedItemName,
+                        price: selectedPrice,
+                        status: "Pending",
+                        date: new Date().toLocaleString()
+                    }).then(() => {
+                        alert("ဝယ်ယူမှု အောင်မြင်ပါသည်။");
+                        window.location.href = "history.html";
+                    });
+                });
+            } else {
+                buyBtn.disabled = false;
+            }
+        });
+    }
+</script>
+</body>
+</html>
